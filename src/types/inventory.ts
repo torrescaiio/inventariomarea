@@ -1,0 +1,16 @@
+export interface MaterialItem {
+  id: string;
+  name: string;
+  currentQuantity: number;
+  reorderPoint: number;
+  image?: string;
+  category: string;
+}
+
+export interface BeverageItem {
+  id: string;
+  name: string;
+  currentQuantity: number;
+  expirationDate: string;
+  image?: string;
+}
