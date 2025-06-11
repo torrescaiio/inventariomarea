@@ -20,7 +20,8 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
     currentQuantity: 0,
     reorderPoint: 0,
     image: "",
-    category: ""
+    category: "",
+    setor: ""
   });
 
   useEffect(() => {
@@ -30,7 +31,8 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
         currentQuantity: initialData.currentQuantity,
         reorderPoint: initialData.reorderPoint,
         image: initialData.image || "",
-        category: initialData.category || ""
+        category: initialData.category || "",
+        setor: initialData.setor || ""
       });
     } else {
       setFormData({
@@ -38,7 +40,8 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
         currentQuantity: 0,
         reorderPoint: 0,
         image: "",
-        category: ""
+        category: "",
+        setor: ""
       });
     }
   }, [initialData, isOpen]);
@@ -116,6 +119,17 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               placeholder="Ex: Talheres, Pratos, Estofados, Eletrônicos..."
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="setor">Setor</Label>
+            <Input
+              id="setor"
+              value={formData.setor}
+              onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
+              placeholder="Ex: Cozinha, Bar, Salão..."
               required
             />
           </div>

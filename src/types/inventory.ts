@@ -5,6 +5,7 @@ export interface MaterialItem {
   reorderPoint: number;
   image?: string;
   category: string;
+  setor: string;
 }
 
 export interface BeverageItem {

@@ -27,7 +27,7 @@ const MaterialsInventory = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("materiais")
-      .select("id, nome, quantidade, ponto_reposicao, imagem_url, categoria");
+      .select("id, nome, quantidade, ponto_reposicao, imagem_url, categoria, setor");
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
@@ -38,7 +38,8 @@ const MaterialsInventory = () => {
           currentQuantity: Number(item.quantidade) || 0,
           reorderPoint: Number(item.ponto_reposicao) || 0,
           image: item.imagem_url || "",
-          category: item.categoria || ""
+          category: item.categoria || "",
+          setor: item.setor || ""
         }))
       );
     }
@@ -56,7 +57,8 @@ const MaterialsInventory = () => {
       quantidade: item.currentQuantity,
       ponto_reposicao: item.reorderPoint,
       imagem_url: item.image,
-      categoria: item.category
+      categoria: item.category,
+      setor: item.setor
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -74,7 +76,8 @@ const MaterialsInventory = () => {
       quantidade: item.currentQuantity,
       ponto_reposicao: item.reorderPoint,
       imagem_url: item.image,
-      categoria: item.category
+      categoria: item.category,
+      setor: item.setor
     }).eq("id", item.id);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -139,10 +142,11 @@ const MaterialsInventory = () => {
       item.image ? { content: '', image: item.image } : '',
       item.name,
       item.category,
+      item.setor,
       item.currentQuantity
     ]);
     autoTable(doc, {
-      head: [["Imagem", "Nome", "Categoria", "Quantidade"]],
+      head: [["Imagem", "Nome", "Categoria", "Setor", "Quantidade"]],
       body: tableData,
       startY: 22,
       didDrawCell: (data) => {
@@ -162,6 +166,7 @@ const MaterialsInventory = () => {
         1: { cellWidth: 50 },
         2: { cellWidth: 40 },
         3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
       },
     });
     doc.save("inventario-materiais.pdf");
@@ -206,6 +211,7 @@ const MaterialsInventory = () => {
               <TableHead>Imagem</TableHead>
               <TableHead>Nome do Item</TableHead>
               <TableHead>Categoria</TableHead>
+              <TableHead>Setor</TableHead>
               <TableHead>Quantidade Atual</TableHead>
               <TableHead>Ponto de Reposição</TableHead>
               <TableHead>Status</TableHead>
@@ -214,9 +220,9 @@ const MaterialsInventory = () => {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={7}>Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8}>Carregando...</TableCell></TableRow>
             ) : filteredMaterials.length === 0 ? (
-              <TableRow><TableCell colSpan={7}>Nenhum item encontrado.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8}>Nenhum item encontrado.</TableCell></TableRow>
             ) : filteredMaterials.map((material) => (
               <TableRow key={material.id}>
                 <TableCell>
@@ -234,6 +240,7 @@ const MaterialsInventory = () => {
                 </TableCell>
                 <TableCell className="font-medium">{material.name}</TableCell>
                 <TableCell>{material.category}</TableCell>
+                <TableCell>{material.setor}</TableCell>
                 <TableCell>{material.currentQuantity}</TableCell>
                 <TableCell>{material.reorderPoint}</TableCell>
                 <TableCell>{getStockStatus(material.currentQuantity, material.reorderPoint)}</TableCell>
