@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, X, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void;
@@ -16,32 +17,52 @@ const ImageUpload = ({ onImageUploaded, currentImage, onRemoveImage }: ImageUplo
   const { toast } = useToast();
   const [imageUrl, setImageUrl] = useState("");
       
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (!event.target.files || event.target.files.length === 0) {
-        return;
-      }
-      const file = event.target.files[0];
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Erro",
-          description: "Por favor, selecione um arquivo de imagem.",
-          variant: "destructive",
-        });
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Erro",
-          description: "A imagem deve ter no máximo 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    onImageUploaded(url);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      return;
+    }
+    const file = event.target.files[0];
+    if (!file.type.startsWith('image/')) {
       toast({
-        title: "Sucesso",
+        title: "Erro",
+        description: "Por favor, selecione um arquivo de imagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erro",
+        description: "A imagem deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setUploading(true);
+    // Gera um nome único para o arquivo
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    const { data, error } = await supabase.storage.from('imagens').upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+    if (error) {
+      toast({
+        title: "Erro ao enviar imagem",
+        description: error.message,
+        variant: "destructive",
+      });
+      setUploading(false);
+      return;
+    }
+    // Pega a URL pública
+    const { data: publicUrlData } = supabase.storage.from('imagens').getPublicUrl(fileName);
+    const publicUrl = publicUrlData.publicUrl;
+    setImageUrl(publicUrl);
+    onImageUploaded(publicUrl);
+    setUploading(false);
+    toast({
+      title: "Sucesso",
       description: "Imagem enviada e salva no Supabase!",
     });
   };
