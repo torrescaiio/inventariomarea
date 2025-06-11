@@ -7,6 +7,8 @@ import { MaterialItem } from "@/types/inventory";
 import MaterialForm from "./MaterialForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MaterialsInventory = () => {
   const { toast } = useToast();
@@ -129,6 +131,42 @@ const MaterialsInventory = () => {
     }
   };
 
+  // Função para exportar PDF
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Inventário de Materiais", 14, 16);
+    const tableData = filteredMaterials.map((item) => [
+      item.image ? { content: '', image: item.image } : '',
+      item.name,
+      item.category,
+      item.currentQuantity
+    ]);
+    autoTable(doc, {
+      head: [["Imagem", "Nome", "Categoria", "Quantidade"]],
+      body: tableData,
+      startY: 22,
+      didDrawCell: (data) => {
+        if (data.column.index === 0 && data.cell.raw && data.cell.raw.image) {
+          doc.addImage(
+            data.cell.raw.image,
+            "JPEG",
+            data.cell.x + 2,
+            data.cell.y + 2,
+            16,
+            16
+          );
+        }
+      },
+      columnStyles: {
+        0: { cellWidth: 20 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 30 },
+      },
+    });
+    doc.save("inventario-materiais.pdf");
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
@@ -154,6 +192,9 @@ const MaterialsInventory = () => {
           <Button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Adicionar Material
+          </Button>
+          <Button onClick={handleExportPDF} variant="secondary" className="flex items-center gap-2">
+            Exportar PDF
           </Button>
         </div>
       </div>
