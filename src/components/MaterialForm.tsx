@@ -71,12 +71,12 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] space-y-6 p-6">
+      <DialogContent className="sm:max-w-[600px] w-full bg-white rounded-xl shadow-2xl border-2 border-gray-100 space-y-8 p-10">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center mb-4">{title}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">Nome do Item</Label>
             <Input
@@ -88,50 +88,52 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="currentQuantity">Quantidade Atual</Label>
-            <Input
-              id="currentQuantity"
-              type="number"
-              min="0"
-              value={formData.currentQuantity}
-              onChange={(e) => setFormData({ ...formData, currentQuantity: parseInt(e.target.value) || 0 })}
-              required
-            />
+          <div className="flex gap-4">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="currentQuantity">Quantidade Atual</Label>
+              <Input
+                id="currentQuantity"
+                type="number"
+                min="0"
+                value={formData.currentQuantity}
+                onChange={(e) => setFormData({ ...formData, currentQuantity: parseInt(e.target.value) || 0 })}
+                required
+              />
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="reorderPoint">Ponto de Reposição</Label>
+              <Input
+                id="reorderPoint"
+                type="number"
+                min="0"
+                value={formData.reorderPoint}
+                onChange={(e) => setFormData({ ...formData, reorderPoint: parseInt(e.target.value) || 0 })}
+                required
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="reorderPoint">Ponto de Reposição</Label>
-            <Input
-              id="reorderPoint"
-              type="number"
-              min="0"
-              value={formData.reorderPoint}
-              onChange={(e) => setFormData({ ...formData, reorderPoint: parseInt(e.target.value) || 0 })}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoria</Label>
-            <Input
-              id="category"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              placeholder="Ex: Talheres, Pratos, Estofados, Eletrônicos..."
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="setor">Setor</Label>
-            <Input
-              id="setor"
-              value={formData.setor}
-              onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
-              placeholder="Ex: Cozinha, Bar, Salão..."
-              required
-            />
+          <div className="flex gap-4">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="category">Categoria</Label>
+              <Input
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="Ex: Talheres, Pratos, Estofados, Eletrônicos..."
+                required
+              />
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="setor">Setor</Label>
+              <Input
+                id="setor"
+                value={formData.setor}
+                onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
+                placeholder="Ex: Cozinha, Bar, Salão..."
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-3 pt-2 pb-1">
@@ -142,11 +144,11 @@ const MaterialForm = ({ isOpen, onClose, onSubmit, initialData, title }: Materia
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-4 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="px-6 py-2 text-base">
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="px-6 py-2 text-base font-semibold">
               {initialData ? "Atualizar" : "Adicionar"}
             </Button>
           </div>
