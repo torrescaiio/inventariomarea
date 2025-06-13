@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,15 +8,15 @@ const InventoryDashboard = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-foreground">Dashboard de Inventário</h1>
-        <p className="text-lg text-muted-foreground">Gerencie o inventário do seu restaurante</p>
+        <h1 className="text-4xl font-bold text-foreground">Inventário Marea</h1>
+        <p className="text-lg text-muted-foreground">Sistema de Gestão de Inventário</p>
       </div>
 
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Controle de Estoque</CardTitle>
+          <CardTitle className="text-2xl">Gestão de Inventário</CardTitle>
           <CardDescription>
-            Monitore e gerencie materiais e bebidas do restaurante
+            Controle de materiais e bebidas do restaurante
           </CardDescription>
         </CardHeader>
         <CardContent>

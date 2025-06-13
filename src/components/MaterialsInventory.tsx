@@ -22,6 +22,22 @@ const MaterialsInventory = () => {
   const [adjustValue, setAdjustValue] = useState(0);
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add');
 
+  // Função para ordenar materiais
+  const sortMaterials = (materials: MaterialItem[]) => {
+    return [...materials].sort((a, b) => {
+      // Primeiro ordena por setor
+      const setorCompare = (a.setor || '').localeCompare(b.setor || '');
+      if (setorCompare !== 0) return setorCompare;
+
+      // Se o setor for igual, ordena por categoria
+      const categoriaCompare = (a.category || '').localeCompare(b.category || '');
+      if (categoriaCompare !== 0) return categoriaCompare;
+
+      // Se a categoria for igual, ordena por nome
+      return (a.name || '').localeCompare(b.name || '');
+    });
+  };
+
   // Buscar materiais do Supabase
   const fetchMaterials = async () => {
     setLoading(true);
@@ -31,17 +47,16 @@ const MaterialsInventory = () => {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
-      setMaterials(
-        (data || []).map((item) => ({
-          id: String(item.id),
-          name: item.nome || "",
-          currentQuantity: Number(item.quantidade) || 0,
-          reorderPoint: Number(item.ponto_reposicao) || 0,
-          image: item.imagem_url || "",
-          category: item.categoria || "",
-          setor: item.setor || ""
-        }))
-      );
+      const mappedMaterials = (data || []).map((item) => ({
+        id: String(item.id),
+        name: item.nome || "",
+        currentQuantity: Number(item.quantidade) || 0,
+        reorderPoint: Number(item.ponto_reposicao) || 0,
+        image: item.imagem_url || "",
+        category: item.categoria || "",
+        setor: item.setor || ""
+      }));
+      setMaterials(sortMaterials(mappedMaterials));
     }
     setLoading(false);
   };
@@ -109,9 +124,11 @@ const MaterialsInventory = () => {
 
   // Filtro de pesquisa e categoria
   const uniqueCategories = Array.from(new Set(materials.map(m => m.category).filter(Boolean)));
-  const filteredMaterials = materials.filter((material) =>
-    material.name.toLowerCase().includes(search.toLowerCase()) &&
-    (categoryFilter === "" || material.category === categoryFilter)
+  const filteredMaterials = sortMaterials(
+    materials.filter((material) =>
+      material.name.toLowerCase().includes(search.toLowerCase()) &&
+      (categoryFilter === "" || material.category === categoryFilter)
+    )
   );
 
   const handleAdjustQuantity = async (item: MaterialItem) => {
