@@ -2,13 +2,23 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash, Minus, Edit2 } from "lucide-react";
+import { Plus, Trash, Minus, Edit2, ArrowUpDown, ChevronDown } from "lucide-react";
 import { MaterialItem } from "@/types/inventory";
 import MaterialForm from "./MaterialForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+type SortOption = 'setor' | 'categoria' | 'nome' | 'quantidade';
+
+const ITEMS_PER_PAGE = 30;
 
 const MaterialsInventory = () => {
   const { toast } = useToast();
@@ -21,20 +31,44 @@ const MaterialsInventory = () => {
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
   const [adjustValue, setAdjustValue] = useState(0);
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add');
+  const [sortBy, setSortBy] = useState<SortOption>('setor');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [displayedItems, setDisplayedItems] = useState<MaterialItem[]>([]);
+  const [hasMore, setHasMore] = useState(true);
 
   // Função para ordenar materiais
   const sortMaterials = (materials: MaterialItem[]) => {
     return [...materials].sort((a, b) => {
-      // Primeiro ordena por setor
-      const setorCompare = (a.setor || '').localeCompare(b.setor || '');
-      if (setorCompare !== 0) return setorCompare;
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'setor':
+          comparison = (a.setor || '').localeCompare(b.setor || '');
+          if (comparison === 0) {
+            comparison = (a.category || '').localeCompare(b.category || '');
+            if (comparison === 0) {
+              comparison = (a.name || '').localeCompare(b.name || '');
+            }
+          }
+          break;
+        case 'categoria':
+          comparison = (a.category || '').localeCompare(b.category || '');
+          if (comparison === 0) {
+            comparison = (a.setor || '').localeCompare(b.setor || '');
+            if (comparison === 0) {
+              comparison = (a.name || '').localeCompare(b.name || '');
+            }
+          }
+          break;
+        case 'nome':
+          comparison = (a.name || '').localeCompare(b.name || '');
+          break;
+        case 'quantidade':
+          comparison = a.currentQuantity - b.currentQuantity;
+          break;
+      }
 
-      // Se o setor for igual, ordena por categoria
-      const categoriaCompare = (a.category || '').localeCompare(b.category || '');
-      if (categoriaCompare !== 0) return categoriaCompare;
-
-      // Se a categoria for igual, ordena por nome
-      return (a.name || '').localeCompare(b.name || '');
+      return sortDirection === 'asc' ? comparison : -comparison;
     });
   };
 
@@ -56,7 +90,9 @@ const MaterialsInventory = () => {
         category: item.categoria || "",
         setor: item.setor || ""
       }));
-      setMaterials(sortMaterials(mappedMaterials));
+      setMaterials(mappedMaterials);
+      setDisplayedItems(mappedMaterials.slice(0, ITEMS_PER_PAGE));
+      setHasMore(mappedMaterials.length > ITEMS_PER_PAGE);
     }
     setLoading(false);
   };
@@ -64,6 +100,14 @@ const MaterialsInventory = () => {
   useEffect(() => {
     fetchMaterials();
   }, []);
+
+  // Função para carregar mais itens
+  const loadMore = () => {
+    const currentLength = displayedItems.length;
+    const nextItems = materials.slice(currentLength, currentLength + ITEMS_PER_PAGE);
+    setDisplayedItems([...displayedItems, ...nextItems]);
+    setHasMore(currentLength + ITEMS_PER_PAGE < materials.length);
+  };
 
   // Adicionar material
   const handleAddItem = async (item: Omit<MaterialItem, "id">) => {
@@ -124,12 +168,16 @@ const MaterialsInventory = () => {
 
   // Filtro de pesquisa e categoria
   const uniqueCategories = Array.from(new Set(materials.map(m => m.category).filter(Boolean)));
-  const filteredMaterials = sortMaterials(
-    materials.filter((material) =>
-      material.name.toLowerCase().includes(search.toLowerCase()) &&
-      (categoryFilter === "" || material.category === categoryFilter)
-    )
+  const filteredMaterials = materials.filter((material) =>
+    material.name.toLowerCase().includes(search.toLowerCase()) &&
+    (categoryFilter === "" || material.category === categoryFilter)
   );
+
+  // Atualizar displayedItems quando o filtro mudar
+  useEffect(() => {
+    setDisplayedItems(filteredMaterials.slice(0, ITEMS_PER_PAGE));
+    setHasMore(filteredMaterials.length > ITEMS_PER_PAGE);
+  }, [search, categoryFilter, materials]);
 
   const handleAdjustQuantity = async (item: MaterialItem) => {
     if (!adjustValue || adjustValue <= 0) {
@@ -155,7 +203,7 @@ const MaterialsInventory = () => {
   const handleExportPDF = () => {
     const doc = new jsPDF();
     doc.text("Inventário de Materiais", 14, 16);
-    const tableData = filteredMaterials.map((item) => [
+    const tableData = displayedItems.map((item) => [
       item.image ? { content: '', image: item.image } : '',
       item.name,
       item.category,
@@ -189,6 +237,15 @@ const MaterialsInventory = () => {
     doc.save("inventario-materiais.pdf");
   };
 
+  const handleSort = (option: SortOption) => {
+    if (sortBy === option) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(option);
+      setSortDirection('asc');
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
@@ -211,6 +268,28 @@ const MaterialsInventory = () => {
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4" />
+                Ordenar por
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => handleSort('setor')}>
+                Setor {sortBy === 'setor' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('categoria')}>
+                Categoria {sortBy === 'categoria' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('nome')}>
+                Nome {sortBy === 'nome' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSort('quantidade')}>
+                Quantidade {sortBy === 'quantidade' && (sortDirection === 'asc' ? '↑' : '↓')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Adicionar Material
@@ -238,9 +317,9 @@ const MaterialsInventory = () => {
           <TableBody>
             {loading ? (
               <TableRow><TableCell colSpan={8}>Carregando...</TableCell></TableRow>
-            ) : filteredMaterials.length === 0 ? (
+            ) : displayedItems.length === 0 ? (
               <TableRow><TableCell colSpan={8}>Nenhum item encontrado.</TableCell></TableRow>
-            ) : filteredMaterials.map((material) => (
+            ) : displayedItems.map((material) => (
               <TableRow key={material.id}>
                 <TableCell>
                   {material.image ? (
@@ -319,6 +398,19 @@ const MaterialsInventory = () => {
           </TableBody>
         </Table>
       </div>
+
+      {hasMore && (
+        <div className="flex justify-center py-4">
+          <Button
+            onClick={loadMore}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ChevronDown className="h-4 w-4" />
+            Carregar mais itens
+          </Button>
+        </div>
+      )}
 
       <MaterialForm
         isOpen={isFormOpen || !!editingItem}

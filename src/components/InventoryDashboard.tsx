@@ -6,13 +6,13 @@ import BeveragesInventory from "./BeveragesInventory";
 
 const InventoryDashboard = () => {
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 min-h-screen flex flex-col">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold text-foreground">Inventário Marea</h1>
         <p className="text-lg text-muted-foreground">Sistema de Gestão de Inventário</p>
       </div>
 
-      <Card className="w-full">
+      <Card className="w-full flex-grow">
         <CardHeader>
           <CardTitle className="text-2xl">Gestão de Inventário</CardTitle>
           <CardDescription>
@@ -40,6 +40,11 @@ const InventoryDashboard = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      <footer className="text-center py-4 text-sm text-muted-foreground border-t">
+        <p>Desenvolvido com ❤️ por Caio Torres</p>
+        <p className="text-xs mt-1">© {new Date().getFullYear()} Todos os direitos reservados</p>
+      </footer>
     </div>
   );
 };
