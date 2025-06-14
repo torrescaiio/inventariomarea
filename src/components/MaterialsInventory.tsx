@@ -19,7 +19,7 @@ const MaterialsInventory = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MaterialItem | null>(null);
   const [loading, setLoading] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState("");
+  const [setorFilter, setSetorFilter] = useState("");
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
   const [adjustValue, setAdjustValue] = useState(0);
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add');
@@ -72,11 +72,11 @@ const MaterialsInventory = () => {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
       const mappedMaterials = (data || []).map((item) => ({
-        id: String(item.id),
-        name: item.nome || "",
-        currentQuantity: Number(item.quantidade) || 0,
-        reorderPoint: Number(item.ponto_reposicao) || 0,
-        image: item.imagem_url || "",
+          id: String(item.id),
+          name: item.nome || "",
+          currentQuantity: Number(item.quantidade) || 0,
+          reorderPoint: Number(item.ponto_reposicao) || 0,
+          image: item.imagem_url || "",
         category: item.categoria || "",
         setor: item.setor || ""
       }));
@@ -156,18 +156,18 @@ const MaterialsInventory = () => {
     return <Badge variant="default">Em Estoque</Badge>;
   };
 
-  // Filtro de pesquisa e categoria
-  const uniqueCategories = Array.from(new Set(materials.map(m => m.category).filter(Boolean)));
+  // Filtro de pesquisa e setor
+  const uniqueSetores = Array.from(new Set(materials.map(m => m.setor).filter(Boolean)));
   const filteredMaterials = materials.filter((material) =>
     material.name.toLowerCase().includes(search.toLowerCase()) &&
-    (categoryFilter === "" || material.category === categoryFilter)
+    (setorFilter === "" || material.setor === setorFilter)
   );
 
   // Atualizar displayedItems quando o filtro mudar
   useEffect(() => {
     setDisplayedItems(filteredMaterials.slice(0, ITEMS_PER_PAGE));
     setHasMore(filteredMaterials.length > ITEMS_PER_PAGE);
-  }, [search, categoryFilter, materials]);
+  }, [search, setorFilter, materials]);
 
   const handleAdjustQuantity = async (item: MaterialItem) => {
     if (!adjustValue || adjustValue <= 0) {
@@ -218,6 +218,7 @@ const MaterialsInventory = () => {
       head: [["Imagem", "Nome", "Categoria", "Setor", "Quantidade"]],
       body: tableData,
       startY: 22,
+      rowPageBreak: 'avoid',
       didDrawCell: (data) => {
         if (data.column.index === 0 && data.cell.raw && data.cell.raw.image) {
           doc.addImage(
@@ -225,17 +226,22 @@ const MaterialsInventory = () => {
             "JPEG",
             data.cell.x + 2,
             data.cell.y + 2,
-            16,
-            16
+            18,
+            18
           );
         }
       },
       columnStyles: {
-        0: { cellWidth: 20 },
+        0: { cellWidth: 22 },
         1: { cellWidth: 50 },
         2: { cellWidth: 40 },
         3: { cellWidth: 30 },
         4: { cellWidth: 30 },
+      },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 0) {
+          data.cell.contentHeight = 22;
+        }
       },
     });
     doc.save("inventario-materiais.pdf");
@@ -254,13 +260,13 @@ const MaterialsInventory = () => {
             className="border rounded px-2 py-1 text-sm"
           />
           <select
-            value={categoryFilter}
-            onChange={e => setCategoryFilter(e.target.value)}
+            value={setorFilter}
+            onChange={e => setSetorFilter(e.target.value)}
             className="border rounded px-2 py-1 text-sm"
           >
-            <option value="">Todas as categorias</option>
-            {uniqueCategories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+            <option value="">Todos os setores</option>
+            {uniqueSetores.map((setor) => (
+              <option key={setor} value={setor}>{setor}</option>
             ))}
           </select>
           <Button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2">
