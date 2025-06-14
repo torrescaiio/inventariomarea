@@ -207,42 +207,23 @@ const MaterialsInventory = () => {
     });
 
     const tableData = sortedMaterials.map((item) => [
-      item.image ? { content: '', image: item.image } : '',
       item.name,
       item.category,
       item.setor,
       item.currentQuantity
     ]);
 
-   autoTable(doc, {
-      head: [["Imagem", "Nome", "Categoria", "Setor", "Quantidade"]],
+    autoTable(doc, {
+      head: [["Nome", "Categoria", "Setor", "Quantidade"]],
       body: tableData,
       startY: 22,
       rowPageBreak: 'avoid',
-      didDrawCell: (data) => {
-        if (data.column.index === 0 && data.cell.raw && data.cell.raw.image) {
-          doc.addImage(
-            data.cell.raw.image,
-            "JPEG",
-            data.cell.x + 2,
-            data.cell.y + 2,
-            60, // Largura da imagem
-            60 // Altura da imagem (para ser quadrada)
-          );
-        }
-      },
       columnStyles: {
-        0: { cellWidth: 70 }, // Largura da coluna para a imagem
-        1: { cellWidth: 50 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 30 },
-      },
-      didParseCell: (data) => {
-        if (data.section === 'body' && data.column.index === 0) {
-          data.cell.contentHeight = 100; // Altura da linha (muito generosa)
-        }
-      },
+        0: { cellWidth: 70 }, // Nome
+        1: { cellWidth: 50 }, // Categoria
+        2: { cellWidth: 40 }, // Setor
+        3: { cellWidth: 30 }, // Quantidade
+      }
     });
     doc.save("inventario-materiais.pdf");
   };
