@@ -343,65 +343,65 @@ const MaterialsInventory = () => {
                     </Button>
                   </div>
                   {adjustingId === material.id && (
-                    <div className=\"mt-2 p-2 border rounded bg-muted flex flex-col gap-2\">
-                      <div className=\"flex gap-2 items-center\">
+                    <div className="mt-2 p-2 border rounded bg-muted flex flex-col gap-2">
+                      <div className="flex gap-2 items-center">
                         <input
-                          type=\"number\"
+                          type="number"
                           min={1}
                           value={adjustValue}
                           onChange={e => setAdjustValue(Number(e.target.value))}
-                          className=\"border rounded px-2 py-1 text-sm w-20\"
-                          placeholder=\"Qtd\"
+                          className="border rounded px-2 py-1 text-sm w-20"
+                          placeholder="Qtd"
                         />
                         <select
                           value={adjustType}
-                          onChange={e => setAdjustType(e.target.value as 'add' | 'subtract')}\"
-                          className=\"border rounded px-2 py-1 text-sm\"
-                        >\
-                          <option value=\"add\">Adicionar</option>
-                          <option value=\"subtract\">Subtrair</option>
+                          onChange={e => setAdjustType(e.target.value as 'add' | 'subtract')}
+                          className="border rounded px-2 py-1 text-sm"
+                        >
+                          <option value="add">Adicionar</option>
+                          <option value="subtract">Subtrair</option>
                         </select>
-                        <Button size=\"sm\" onClick={() => handleAdjustQuantity(material)}>\
-                          OK\
-                        </Button>\
-                        <Button size=\"sm\" variant=\"ghost\" onClick={() => setAdjustingId(null)}>\
-                          Cancelar\
-                        </Button>\
-                      </div>\
-                    </div>\
-                  )}\
-                </TableCell>\
-              </TableRow>\
-            ))}\
-          </TableBody>\
-        </Table>\
-      </div>\
-\
-      {hasMore && (\
-        <div className=\"flex justify-center py-4\">\
-          <Button\
-            onClick={loadMore}\
-            variant=\"outline\"\
-            className=\"flex items-center gap-2\"\
-          >\
-            <ChevronDown className=\"h-4 w-4\" />\
-            Carregar mais itens\
-          </Button>\
-        </div>\
-      )}\
-\
-      <MaterialForm\
-        isOpen={isFormOpen || !!editingItem}\
-        onClose={() => {\
-          setIsFormOpen(false);\
-          setEditingItem(null);\
-        }}\
-        onSubmit={editingItem ? handleEditItem : handleAddItem}\
-        initialData={editingItem}\
-        title={editingItem ? \"Editar Material\" : \"Adicionar Material\"}\
-      />\
-    </div>\
-  );\
-};\
-\
-export default MaterialsInventory;\n```
+                        <Button size="sm" onClick={() => handleAdjustQuantity(material)}>
+                          OK
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setAdjustingId(null)}>
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {hasMore && (
+        <div className="flex justify-center py-4">
+          <Button
+            onClick={loadMore}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ChevronDown className="h-4 w-4" />
+            Carregar mais itens
+          </Button>
+        </div>
+      )}
+
+      <MaterialForm
+        isOpen={isFormOpen || !!editingItem}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingItem(null);
+        }}
+        onSubmit={editingItem ? handleEditItem : handleAddItem}
+        initialData={editingItem}
+        title={editingItem ? "Editar Material" : "Adicionar Material"}
+      />
+    </div>
+  );
+};
+
+export default MaterialsInventory;
