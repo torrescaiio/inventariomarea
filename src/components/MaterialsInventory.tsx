@@ -226,13 +226,13 @@ const MaterialsInventory = () => {
             "JPEG",
             data.cell.x + 2,
             data.cell.y + 2,
-            40, // VALOR CORRIGIDO PARA 40
-            40  // VALOR CORRIGIDO PARA 40
+            40, // Largura da imagem
+            120 // Altura da imagem (triplo do padrão anterior)
           );
         }
       },
       columnStyles: {
-        0: { cellWidth: 50 }, // VALOR CORRIGIDO PARA 50
+        0: { cellWidth: 50 }, // Largura da coluna para a imagem
         1: { cellWidth: 50 },
         2: { cellWidth: 40 },
         3: { cellWidth: 30 },
@@ -240,7 +240,7 @@ const MaterialsInventory = () => {
       },
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 0) {
-          data.cell.contentHeight = 60; // VALOR CORRIGIDO PARA 60
+          data.cell.contentHeight = 180; // Altura da linha (triplo do padrão anterior)
         }
       },
     });
