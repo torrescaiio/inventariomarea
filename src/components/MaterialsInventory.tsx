@@ -214,7 +214,7 @@ const MaterialsInventory = () => {
       item.currentQuantity
     ]);
 
-    autoTable(doc, {
+   autoTable(doc, {
       head: [["Imagem", "Nome", "Categoria", "Setor", "Quantidade"]],
       body: tableData,
       startY: 22,
@@ -226,13 +226,13 @@ const MaterialsInventory = () => {
             "JPEG",
             data.cell.x + 2,
             data.cell.y + 2,
-            18,
-            18
+            25, // <--- AUMENTEI DE 18 PARA 25
+            25  // <--- AUMENTEI DE 18 PARA 25
           );
         }
       },
       columnStyles: {
-        0: { cellWidth: 22 },
+        0: { cellWidth: 28 }, // <--- AUMENTEI DE 22 PARA 28
         1: { cellWidth: 50 },
         2: { cellWidth: 40 },
         3: { cellWidth: 30 },
@@ -240,7 +240,7 @@ const MaterialsInventory = () => {
       },
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 0) {
-          data.cell.contentHeight = 22;
+          data.cell.contentHeight = 28; // <--- AUMENTEI DE 22 PARA 28
         }
       },
     });
