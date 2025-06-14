@@ -226,13 +226,13 @@ const MaterialsInventory = () => {
             "JPEG",
             data.cell.x + 2,
             data.cell.y + 2,
-            25, // <--- AUMENTEI DE 18 PARA 25
-            25  // <--- AUMENTEI DE 18 PARA 25
+            75, // <--- AUMENTEI DE 25 PARA 75 (25 * 3)
+            75  // <--- AUMENTEI DE 25 PARA 75 (25 * 3)
           );
         }
       },
       columnStyles: {
-        0: { cellWidth: 28 }, // <--- AUMENTEI DE 22 PARA 28
+        0: { cellWidth: 84 }, // <--- AUMENTEI DE 28 PARA 84 (28 * 3)
         1: { cellWidth: 50 },
         2: { cellWidth: 40 },
         3: { cellWidth: 30 },
@@ -240,13 +240,12 @@ const MaterialsInventory = () => {
       },
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 0) {
-          data.cell.contentHeight = 28; // <--- AUMENTEI DE 22 PARA 28
+          data.cell.contentHeight = 84; // <--- AUMENTEI DE 28 PARA 84 (28 * 3)
         }
       },
     });
     doc.save("inventario-materiais.pdf");
   };
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
