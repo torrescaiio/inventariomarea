@@ -3,13 +3,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import MaterialsInventory from "./MaterialsInventory";
 import BeveragesInventory from "./BeveragesInventory";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const InventoryDashboard = () => {
+  const { signOut } = useAuth();
+
   return (
     <div className="container mx-auto p-6 space-y-6 min-h-screen flex flex-col">
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 relative">
         <h1 className="text-4xl font-bold text-foreground">Inventário Marea</h1>
         <p className="text-lg text-muted-foreground">Sistema de Gestão de Inventário</p>
+        <Button 
+          onClick={signOut} 
+          variant="outline" 
+          className="absolute top-0 right-0 px-4 py-2 text-base"
+        >
+          Sair
+        </Button>
       </div>
 
       <Card className="w-full flex-grow">
