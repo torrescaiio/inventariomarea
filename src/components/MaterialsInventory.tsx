@@ -77,7 +77,7 @@ const MaterialsInventory = () => {
           currentQuantity: Number(item.quantidade) || 0,
           reorderPoint: Number(item.ponto_reposicao) || 0,
           image: item.imagem_url || "",
-        category: item.category || "",
+        category: item.categoria || '',
         setor: item.setor || ""
       }));
       setMaterials(mappedMaterials);
