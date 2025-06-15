@@ -14,4 +14,5 @@ export interface BeverageItem {
   currentQuantity: number;
   reorderPoint: number;
   image?: string;
+  category: string;
 }

@@ -20,6 +20,7 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
     currentQuantity: 0,
     reorderPoint: 0,
     image: "",
+    category: "",
   });
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
         currentQuantity: initialData.currentQuantity,
         reorderPoint: initialData.reorderPoint,
         image: initialData.image || "",
+        category: initialData.category || "",
       });
     } else {
       setFormData({
@@ -36,6 +38,7 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
         currentQuantity: 0,
         reorderPoint: 0,
         image: "",
+        category: "",
       });
     }
   }, [initialData, isOpen]);
@@ -105,6 +108,17 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
               required
             />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Categoria</Label>
+            <Input
+              id="category"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="Ex: Cervejas, Refrigerantes, Sucos..."
+              required
+            />
           </div>
 
           <div className="space-y-3 pt-2 pb-1">

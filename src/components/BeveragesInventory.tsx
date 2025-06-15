@@ -23,6 +23,7 @@ const BeveragesInventory = () => {
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
   const [adjustValue, setAdjustValue] = useState(0);
   const [adjustType, setAdjustType] = useState<'add' | 'subtract'>('add');
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [displayedItems, setDisplayedItems] = useState<BeverageItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
 
@@ -31,7 +32,7 @@ const BeveragesInventory = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("bebidas")
-      .select("id, nome, quantidade, ponto_reposicao, imagem_url");
+      .select("id, nome, quantidade, ponto_reposicao, imagem_url, categoria");
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
@@ -41,6 +42,7 @@ const BeveragesInventory = () => {
         currentQuantity: Number(item.quantidade) || 0,
         reorderPoint: Number(item.ponto_reposicao) || 0,
         image: item.imagem_url || "",
+        category: item.categoria || "",
       }));
       setBeverages(mappedBeverages);
       setDisplayedItems(mappedBeverages.slice(0, ITEMS_PER_PAGE));
@@ -68,6 +70,7 @@ const BeveragesInventory = () => {
       quantidade: item.currentQuantity,
       ponto_reposicao: item.reorderPoint,
       imagem_url: item.image,
+      categoria: item.category,
     });
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -85,6 +88,7 @@ const BeveragesInventory = () => {
       quantidade: item.currentQuantity,
       ponto_reposicao: item.reorderPoint,
       imagem_url: item.image,
+      categoria: item.category,
     }).eq("id", item.id);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
@@ -114,16 +118,18 @@ const BeveragesInventory = () => {
     return <Badge variant="default">Em Estoque</Badge>;
   };
 
-  // Filtro de pesquisa
+  // Filtro de pesquisa e categoria
+  const uniqueCategories = Array.from(new Set(beverages.map(m => m.category).filter(Boolean)));
   const filteredBeverages = beverages.filter((beverage) =>
-    beverage.name.toLowerCase().includes(search.toLowerCase())
+    beverage.name.toLowerCase().includes(search.toLowerCase()) &&
+    (categoryFilter === "" || beverage.category === categoryFilter)
   );
 
   // Atualizar displayedItems quando o filtro mudar
   useEffect(() => {
     setDisplayedItems(filteredBeverages.slice(0, ITEMS_PER_PAGE));
     setHasMore(filteredBeverages.length > ITEMS_PER_PAGE);
-  }, [search, beverages]);
+  }, [search, categoryFilter, beverages]);
 
   const handleAdjustQuantity = async (item: BeverageItem) => {
     if (!adjustValue || adjustValue <= 0) {
@@ -157,19 +163,21 @@ const BeveragesInventory = () => {
 
     const tableData = sortedBeverages.map((item) => [
       item.name,
+      item.category,
       item.currentQuantity,
       item.reorderPoint
     ]);
 
     autoTable(doc, {
-      head: [["Nome", "Quantidade Atual", "Ponto de Reposição"]],
+      head: [["Nome", "Categoria", "Quantidade Atual", "Ponto de Reposição"]],
       body: tableData,
       startY: 22,
       rowPageBreak: 'avoid',
       columnStyles: {
-        0: { cellWidth: 80 }, // Nome
-        1: { cellWidth: 60 }, // Quantidade Atual
-        2: { cellWidth: 50 }, // Ponto de Reposição
+        0: { cellWidth: 70 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 60 },
+        3: { cellWidth: 50 },
       }
     });
     doc.save("inventario-bebidas.pdf");
@@ -186,6 +194,16 @@ const BeveragesInventory = () => {
             onChange={e => setSearch(e.target.value)}
             className="border rounded px-2 py-1 text-sm"
           />
+          <select
+            value={categoryFilter}
+            onChange={e => setCategoryFilter(e.target.value)}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="">Todas as categorias</option>
+            {uniqueCategories.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
           <Button onClick={() => setIsFormOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Adicionar Bebida
@@ -202,6 +220,7 @@ const BeveragesInventory = () => {
             <TableRow>
               <TableHead>Imagem</TableHead>
               <TableHead>Nome da Bebida</TableHead>
+              <TableHead>Categoria</TableHead>
               <TableHead>Quantidade Atual</TableHead>
               <TableHead>Ponto de Reposição</TableHead>
               <TableHead>Status</TableHead>
@@ -211,11 +230,11 @@ const BeveragesInventory = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">Carregando bebidas...</TableCell>
+                <TableCell colSpan={7} className="text-center">Carregando bebidas...</TableCell>
               </TableRow>
             ) : displayedItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">Nenhuma bebida encontrada.</TableCell>
+                <TableCell colSpan={7} className="text-center">Nenhuma bebida encontrada.</TableCell>
               </TableRow>
             ) : (
               displayedItems.map((beverage) => (
@@ -226,6 +245,7 @@ const BeveragesInventory = () => {
                     )}
                   </TableCell>
                   <TableCell className="font-medium">{beverage.name}</TableCell>
+                  <TableCell>{beverage.category}</TableCell>
                   <TableCell>{beverage.currentQuantity}</TableCell>
                   <TableCell>{beverage.reorderPoint}</TableCell>
                   <TableCell>{getStockStatus(beverage.currentQuantity, beverage.reorderPoint)}</TableCell>
@@ -256,7 +276,7 @@ const BeveragesInventory = () => {
             )}
             {adjustingId && (
               <TableRow>
-                <TableCell colSpan={6}>
+                <TableCell colSpan={7}>
                   <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
                     <Button
                       size="sm"
