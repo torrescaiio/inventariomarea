@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +37,7 @@ const LoginPage = () => {
       toast({ title: "Erro de Autenticação", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Sucesso", description: isSignUp ? "Cadastro realizado com sucesso! Verifique seu e-mail para confirmar." : "Login realizado com sucesso!", variant: "default" });
-      // Redirecionamento será tratado pelo AuthContext
+      navigate("/");
     }
     setLoading(false);
   };
