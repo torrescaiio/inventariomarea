@@ -1,15 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import { BeverageItem } from "@/types/inventory";
 import ImageUpload from "./ImageUpload";
 
@@ -25,37 +18,27 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
   const [formData, setFormData] = useState({
     name: "",
     currentQuantity: 0,
-    expirationDate: "",
-    image: ""
+    reorderPoint: 0,
+    image: "",
   });
-  const [selectedDate, setSelectedDate] = useState<Date>();
 
   useEffect(() => {
     if (initialData) {
       setFormData({
         name: initialData.name,
         currentQuantity: initialData.currentQuantity,
-        expirationDate: initialData.expirationDate,
-        image: initialData.image || ""
+        reorderPoint: initialData.reorderPoint,
+        image: initialData.image || "",
       });
-      setSelectedDate(new Date(initialData.expirationDate));
     } else {
       setFormData({
         name: "",
         currentQuantity: 0,
-        expirationDate: "",
-        image: ""
+        reorderPoint: 0,
+        image: "",
       });
-      setSelectedDate(undefined);
     }
   }, [initialData, isOpen]);
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      setFormData({ ...formData, expirationDate: date.toISOString().split('T')[0] });
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,24 +65,25 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px] w-full bg-white rounded-xl shadow-2xl border-2 border-gray-100 space-y-8 p-10">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center mb-4">{title}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">Nome da Bebida</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ex: Coca-Cola, Água, Suco..."
+              placeholder="Ex: Coca-cola, Suco de Laranja, Água..."
               required
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="flex gap-4">
+            <div className="flex-1 space-y-2">
             <Label htmlFor="currentQuantity">Quantidade Atual</Label>
             <Input
               id="currentQuantity"
@@ -110,45 +94,32 @@ const BeverageForm = ({ isOpen, onClose, onSubmit, initialData, title }: Beverag
               required
             />
           </div>
-
-          <div className="space-y-2">
-            <Label>Data de Validade</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !selectedDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, "dd/MM/yyyy", { locale: ptBR }) : "Selecione uma data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={handleDateSelect}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
-              </PopoverContent>
-            </Popover>
+            <div className="flex-1 space-y-2">
+            <Label htmlFor="reorderPoint">Ponto de Reposição</Label>
+            <Input
+              id="reorderPoint"
+              type="number"
+              min="0"
+              value={formData.reorderPoint}
+              onChange={(e) => setFormData({ ...formData, reorderPoint: parseInt(e.target.value) || 0 })}
+              required
+            />
+            </div>
           </div>
 
-          <ImageUpload
-            onImageUploaded={handleImageUploaded}
-            currentImage={formData.image}
-            onRemoveImage={handleRemoveImage}
-          />
+          <div className="space-y-3 pt-2 pb-1">
+            <ImageUpload
+              onImageUploaded={handleImageUploaded}
+              currentImage={formData.image}
+              onRemoveImage={handleRemoveImage}
+            />
+          </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-4 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="px-6 py-2 text-base">
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" className="px-6 py-2 text-base font-semibold">
               {initialData ? "Atualizar" : "Adicionar"}
             </Button>
           </div>

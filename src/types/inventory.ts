@@ -12,6 +12,6 @@ export interface BeverageItem {
   id: string;
   name: string;
   currentQuantity: number;
-  expirationDate: string;
+  reorderPoint: number;
   image?: string;
 }
