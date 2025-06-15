@@ -174,10 +174,10 @@ const BeveragesInventory = () => {
       startY: 22,
       rowPageBreak: 'avoid',
       columnStyles: {
-        0: { cellWidth: 70 },
-        1: { cellWidth: 50 },
-        2: { cellWidth: 60 },
-        3: { cellWidth: 50 },
+        0: { cellWidth: 60 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: 40 },
       }
     });
     doc.save("inventario-bebidas.pdf");
